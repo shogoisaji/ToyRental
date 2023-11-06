@@ -15,7 +15,7 @@ import Loading from "app/loading";
 type Schema = z.infer<typeof schema>;
 
 const schema = z.object({
-  productName: z.string().max(20, "20文字以下で入力してください"),
+  productName: z.string(),
   description: z.string().max(200, "200文字以下で入力してください"),
   price: z.string().transform(parseFloat),
 });
@@ -25,22 +25,16 @@ const Register = () => {
   const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [productName, setProductName] = useState("");
-  const [description, setDescription] = useState("");
-  // const [productID, setProductID] = useState("");
+  // const [imageUrlJson, setImageUrlJson] = useState("");
   const [productImage, setProductImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState("");
   const [fileMessage, setFileMessage] = useState("");
-  const { user } = useStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Schema>({
-    defaultValues: {
-      // name: user.name ? user.name : "",
-    },
+    defaultValues: {},
     // check form
     resolver: zodResolver(schema),
   });
@@ -78,13 +72,33 @@ const Register = () => {
     []
   );
 
+  const insertProduct = async (
+    data: Schema,
+    productID: string,
+    imageUrlJson: string
+  ) => {
+    const { error: updateError } = await supabase.from("toys").insert({
+      id: productID,
+      product_name: data.productName,
+      images: imageUrlJson,
+      description: data.description,
+      price: data.price,
+    });
+
+    if (updateError) {
+      return updateError.message;
+    }
+
+    return null;
+  };
+
   // submit
   const onSubmit: SubmitHandler<Schema> = async (data) => {
     setLoading(true);
     setMessage("");
 
-    if (!productImage && !productName && !description) {
-      setMessage("未入力のデータがあります。");
+    if (!data.productName && !data.price) {
+      setMessage("商品名と料金は必須の入力項目です。");
       setLoading(false);
       return;
     }
@@ -92,27 +106,28 @@ const Register = () => {
     try {
       const productID = uuidv4();
       const currentDatetime = new Date().toISOString();
+      let imageUrlJson: string = "";
 
-      // supabase upload
-      const { data: storageData, error: storageError } = await supabase.storage
-        .from("toys")
-        .upload(`${productID}/${currentDatetime}`, productImage!);
+      if (productImage) {
+        // image upload
+        const { data: storageData, error: storageError } =
+          await supabase.storage
+            .from("toys")
+            .upload(`${productID}/${currentDatetime}`, productImage!);
 
-      // error check
-      if (storageError) {
-        setMessage("エラーが発生しました。storage:" + storageError.message);
-        return;
+        // error check
+        if (storageError) {
+          setMessage("エラーが発生しました。storage:" + storageError.message);
+          return;
+        }
+
+        // get Image url
+        const { data: urlData } = await supabase.storage
+          .from("toys")
+          .getPublicUrl(storageData.path);
+
+        imageUrlJson = JSON.stringify([urlData.publicUrl]);
       }
-
-      // get Image url
-      const { data: urlData } = await supabase.storage
-        .from("toys")
-        .getPublicUrl(storageData.path);
-
-      const newImageUrl = urlData.publicUrl;
-      setImageUrl(newImageUrl);
-      // Convert imageUrl to array json
-      const imageUrlJson: string = JSON.stringify([newImageUrl]);
 
       // insert product
       const { error: updateError } = await supabase.from("toys").insert({
@@ -196,7 +211,7 @@ const Register = () => {
             rows={3}
             className="border rounded-md w-full py-2 px-3 focus:outline-none focus:border-sky-500"
             id="description"
-            {...register("description", { required: true })}
+            {...register("description")}
             required
           />
           <div className="my-3 text-center text-sm text-red-500">

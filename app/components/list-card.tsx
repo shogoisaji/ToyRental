@@ -25,20 +25,18 @@ export const ListCard: React.FC<ToyCardProps> = ({ toy }) => {
     if (toy.images && typeof toy.images === "string") {
       return JSON.parse(toy.images);
     }
-    return ["/avatars/avatar5.png"];
+    return ["/no_image.png"];
   };
 
   return (
     <div className="shadow-xl shadow-black-900 max-w-sm rounded-xl bg-custom-blue5">
-      <Link href={`/toys/${toy.id}`}>
+      <Link href={`/toys/${toy.id}/detail`}>
         <div
           className="rounded-t-xl overflow-hidden"
           style={{ width: "100%", height: "300px", position: "relative" }}
         >
           <Image
-            src={
-              toy.images ? decodeImages(toy.images)![0] : "/avatars/avatar5.png"
-            }
+            src={toy.images ? decodeImages(toy.images)![0] : "/no_image.png"}
             alt={toy.product_name}
             layout="fill"
             objectFit="cover"
@@ -55,7 +53,12 @@ export const ListCard: React.FC<ToyCardProps> = ({ toy }) => {
           </p>
         </div>
         <div className="flex justify-center items-center">
-          <ArchiveBoxIcon className="inline-block text-custom-blue7 w-7 h-7 mr-3" />
+          {toy.is_rented ? (
+            <ArchiveBoxXMarkIcon className="inline-block text-red-500 w-7 h-7 mr-3" />
+          ) : (
+            <ArchiveBoxIcon className="inline-block text-custom-blue7 w-7 h-7 mr-3" />
+          )}
+
           <div className="text-white">
             <span className="text-white text-lg">￥</span>
             {toy.price}

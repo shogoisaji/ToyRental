@@ -1,10 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Database, Json } from "app/lib/database.types";
-import useStore from "store";
 import { ListCard } from "app/components/list-card";
 
 type Toy = {
@@ -18,12 +16,9 @@ type Toy = {
 };
 
 const List = () => {
-  const router = useRouter();
   const supabase = createClientComponentClient<Database>();
   const [toysList, setToysList] = useState<Toy[]>([]);
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const { user } = useStore();
 
   useEffect(() => {
     getToys();
@@ -32,7 +27,7 @@ const List = () => {
   const getToys = async () => {
     const { data: toys, error } = await supabase
       .from("toys")
-      .select("*")
+      .select()
       .order("id", { ascending: false });
     if (error) {
       setMessage(error.message);
