@@ -40,6 +40,7 @@ const Navigation = ({
             <div className="flex items-center space-x-5 text-white text-lg">
               <Link href="/">HOME</Link>
               <Link href="/">RENTAL</Link>
+              <Link href="/">CART</Link>
               <Link href="/settings/profile">
                 <div className="relative w-12 h-12">
                   <Image
