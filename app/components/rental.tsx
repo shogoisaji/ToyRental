@@ -53,11 +53,10 @@ const Rental = () => {
                     <h2>{toys.product_name}</h2>
                     <p>{toys.description}</p>
                     {/* <Image
-            src={toys.images ? toys.images[0] : "/avatars/avatar1.png"}
-            alt={toys.product_name}
-            width={100}
-            height={100}
-          /> */}
+                      alt={toys.product_name}
+                      width={100}
+                      height={100}
+                    /> */}
                 </div>
             ))}
         </div>
