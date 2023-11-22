@@ -1,34 +1,56 @@
-import { createContext, useContext, useState, useEffect } from "react";
+'use client'
+
+import { createContext, useState } from 'react'
 
 type CartItem = {
-  productID: string;
-  productName: string;
-  productImage: string[];
-  quantity: number;
-};
+    productID: string
+    productName: string
+    productPrice: number
+    productImage: string[]
+    quantity: number
+}
 
-export const CartContext = createContext<(newItem: CartItem) => void>(() => {});
+type CartContextType = {
+    cartItems: CartItem[]
+    addToCart: (item: CartItem) => void
+}
 
-// export function useCartContext() {
-//   return useContext(CartContext);
-// }
+export const CartContext = createContext<CartContextType>({
+    cartItems: [],
+    addToCart: (item: CartItem) => {},
+})
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isLoading, setisLoading] = useState(false);
+    const [cart, setCart] = useState<CartItem[]>([])
+    const [isLoading, setisLoading] = useState(false)
 
-  async function addToCart(newItem: CartItem) {
-    setisLoading(true);
-    // empty cart
-    if (cart.length === 0) {
-      setCart([...cart, newItem]);
-    } else {
-      setCart([newItem]);
+    const addToCart = async (newItem: CartItem) => {
+        setisLoading(true)
+
+        // 既存のアイテムを検索
+        const existingItemIndex = cart.findIndex(
+            (item) => item.productID === newItem.productID
+        )
+
+        // 既存のアイテムがある場合は数量を更新
+        if (existingItemIndex !== -1) {
+            const updatedCart = [...cart]
+            updatedCart[existingItemIndex] = {
+                ...cart[existingItemIndex],
+                quantity: cart[existingItemIndex].quantity + newItem.quantity,
+            }
+            setCart(updatedCart)
+        } else {
+            // 新しいアイテムをカートに追加
+            setCart([...cart, newItem])
+        }
+
+        setisLoading(false)
     }
-    setisLoading(false);
-  }
 
-  return (
-    <CartContext.Provider value={addToCart}>{children}</CartContext.Provider>
-  );
+    return (
+        <CartContext.Provider value={{ cartItems: cart, addToCart }}>
+            {children}
+        </CartContext.Provider>
+    )
 }
