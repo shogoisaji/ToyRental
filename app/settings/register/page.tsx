@@ -1,5 +1,3 @@
-'use client'
-
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import Register from 'app/components/register'
 import { Database } from 'app/lib/database.types'
