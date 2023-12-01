@@ -1,19 +1,13 @@
 'use client'
 
-import {
-    ArchiveBoxIcon,
-    ArchiveBoxXMarkIcon,
-} from '@heroicons/react/24/outline'
 import { Database, Json } from 'app/lib/database.types'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useEffect, useState } from 'react'
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
 import { ProductInfo } from 'app/components/productInfo'
 import BackToProductButton from 'app/components/backToProductButton'
 import ProductImage from 'app/components/productImage'
 import { ProductForm } from 'app/components/productForm'
-// import { ProductForm } from "app/components/productForm";
 
 type Toy = {
     created_at: string

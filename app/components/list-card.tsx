@@ -1,5 +1,3 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -42,7 +40,6 @@ export const ListCard: React.FC<ToyCardProps> = ({ toy }) => {
                     }}
                 >
                     <Image
-
                         src={toy.images ? decodeImages()![0] : '/no_image.png'}
                         alt={toy.product_name}
                         layout="fill"

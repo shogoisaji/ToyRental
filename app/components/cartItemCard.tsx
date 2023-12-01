@@ -1,8 +1,4 @@
-'use client'
-
 import Image from 'next/image'
-
-import { Json } from 'app/lib/database.types'
 
 type CartItem = {
     productID: string
